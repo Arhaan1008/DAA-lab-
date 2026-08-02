@@ -1,0 +1,39 @@
+Towers of Hanoi (ToH): Simulate the solution to the ToH problem using C.Plot the total number of moves required for solving the problem of n-discs.
+What can you conclude about your algorithm from the plot obtained?
+
+code:
+
+#include <stdio.h>
+
+long long moves=0;
+
+void hanoi(int n,char source,char auxiliary,char destination)
+{
+    if(n==1)
+    {
+        printf("Move disk 1 from %c to %c\n",source,destination);
+        moves++;
+        return;
+    }
+
+    hanoi(n-1,source,destination,auxiliary);
+
+    printf("Move disk %d from %c to %c\n",n,source,destination);
+    moves++;
+
+    hanoi(n-1,auxiliary,source,destination);
+}
+
+int main()
+{
+    int n;
+
+    printf("Enter number of disks: ");
+    scanf("%d",&n);
+
+    hanoi(n,'A','B','C');
+
+    printf("\nTotal Moves = %lld\n",moves);
+
+    return 0;
+}
