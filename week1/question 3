@@ -1,0 +1,78 @@
+Performance analysis of bubble sort: Using C, implement two different versions of bubble sort simulation for randomised data sequences as follows:
+(i) Bubble sort that terminates if the array is sorted before the (n − 1)th pass.
+(ii) Bubble sort that always completes the (n − 1)th pas
+
+code:
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+void bubbleOptimized(int a[],int n)
+{
+    int comparisons=0,swapped;
+
+    for(int i=0;i<n-1;i++)
+    {
+        swapped=0;
+
+        for(int j=0;j<n-i-1;j++)
+        {
+            comparisons++;
+
+            if(a[j]>a[j+1])
+            {
+                int t=a[j];
+                a[j]=a[j+1];
+                a[j+1]=t;
+                swapped=1;
+            }
+        }
+
+        if(!swapped)
+            break;
+    }
+
+    printf("Optimized Comparisons = %d\n",comparisons);
+}
+
+void bubbleNormal(int a[],int n)
+{
+    int comparisons=0;
+
+    for(int i=0;i<n-1;i++)
+    {
+        for(int j=0;j<n-i-1;j++)
+        {
+            comparisons++;
+
+            if(a[j]>a[j+1])
+            {
+                int t=a[j];
+                a[j]=a[j+1];
+                a[j+1]=t;
+            }
+        }
+    }
+
+    printf("Normal Comparisons = %d\n",comparisons);
+}
+
+int main()
+{
+    int n=20;
+    int a[20],b[20];
+
+    srand(time(NULL));
+
+    for(int i=0;i<n;i++)
+    {
+        a[i]=rand()%100;
+        b[i]=a[i];
+    }
+
+    bubbleOptimized(a,n);
+    bubbleNormal(b,n);
+
+    return 0;
+}
