@@ -1,0 +1,41 @@
+Fair vs Biased coin: Using simulation in C, show that the probability of getting a HEAD by tossing a fair coin is about 0.5. Extend your simulation to compare fair vs biased coin-tossing experiments.
+
+code:
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+int main() {
+
+    int tosses = 1000000;
+    int heads = 0;
+
+    srand(time(NULL));
+
+    for(int i=0;i<tosses;i++)
+    {
+        double r=(double)rand()/RAND_MAX;
+
+        if(r<0.5)
+            heads++;
+    }
+
+    printf("Fair Coin\n");
+    printf("Heads Probability = %.5f\n",(double)heads/tosses);
+
+    heads=0;
+
+    for(int i=0;i<tosses;i++)
+    {
+        double r=(double)rand()/RAND_MAX;
+
+        if(r<0.7)
+            heads++;
+    }
+
+    printf("\nBiased Coin (P(H)=0.7)\n");
+    printf("Heads Probability = %.5f\n",(double)heads/tosses);
+
+    return 0;
+}
