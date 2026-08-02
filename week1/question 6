@@ -1,0 +1,47 @@
+Element uniqueness:: For given n random numbers, implement a method in C to check if there are any duplicates.
+What can you conclude about your method for a sufficiently large value of n?
+
+code:
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int compare(const void *a,const void *b)
+{
+    return (*(int*)a-*(int*)b);
+}
+
+int unique(int a[],int n)
+{
+    qsort(a,n,sizeof(int),compare);
+
+    for(int i=1;i<n;i++)
+    {
+        if(a[i]==a[i-1])
+            return 0;
+    }
+
+    return 1;
+}
+
+int main()
+{
+    int n;
+
+    printf("Enter size: ");
+    scanf("%d",&n);
+
+    int a[n];
+
+    printf("Enter elements:\n");
+
+    for(int i=0;i<n;i++)
+        scanf("%d",&a[i]);
+
+    if(unique(a,n))
+        printf("All elements are unique.\n");
+    else
+        printf("Duplicate elements found.\n");
+
+    return 0;
+}
