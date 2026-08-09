@@ -1,0 +1,459 @@
+Merge sort vs modified merge sort:
+
+Code:
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+void generateRandomArray(int a[], int n)
+{
+    int i;
+
+    for (i = 0; i < n; i++)
+    {
+        a[i] = rand() % 10000;
+    }
+}
+
+void copyArray(int source[], int destination[], int n)
+{
+    int i;
+
+    for (i = 0; i < n; i++)
+    {
+        destination[i] = source[i];
+    }
+}
+
+long long mergeTwo(int a[], int temp[], int left, int mid, int right)
+{
+    int i = left;
+    int j = mid + 1;
+    int k = left;
+
+    long long comparisons = 0;
+
+    while (i <= mid && j <= right)
+    {
+        comparisons++;
+
+        if (a[i] <= a[j])
+        {
+            temp[k] = a[i];
+            i++;
+        }
+        else
+        {
+            temp[k] = a[j];
+            j++;
+        }
+
+        k++;
+    }
+
+    while (i <= mid)
+    {
+        temp[k] = a[i];
+        i++;
+        k++;
+    }
+
+    while (j <= right)
+    {
+        temp[k] = a[j];
+        j++;
+        k++;
+    }
+
+    for (i = left; i <= right; i++)
+    {
+        a[i] = temp[i];
+    }
+
+    return comparisons;
+}
+
+
+long long mergeSort(int a[], int temp[], int left, int right)
+{
+    int mid;
+    long long comparisons = 0;
+
+    if (left < right)
+    {
+        mid = left + (right - left) / 2;
+
+        comparisons += mergeSort(a, temp, left, mid);
+        comparisons += mergeSort(a, temp, mid + 1, right);
+
+        comparisons += mergeTwo(a, temp, left, mid, right);
+    }
+
+    return comparisons;
+}
+
+long long mergeThree(int a[], int temp[],
+                     int left, int mid1,
+                     int mid2, int right)
+{
+    int i = left;
+    int j = mid1 + 1;
+    int k = mid2 + 1;
+    int p = left;
+
+    long long comparisons = 0;
+
+    while (i <= mid1 && j <= mid2 && k <= right)
+    {
+        /* Compare first and second */
+        comparisons++;
+
+        if (a[i] <= a[j])
+        {
+            comparisons++;
+
+            if (a[i] <= a[k])
+            {
+                temp[p] = a[i];
+                i++;
+            }
+            else
+            {
+                temp[p] = a[k];
+                k++;
+            }
+        }
+        else
+        {
+            comparisons++;
+
+            if (a[j] <= a[k])
+            {
+                temp[p] = a[j];
+                j++;
+            }
+            else
+            {
+                temp[p] = a[k];
+                k++;
+            }
+        }
+
+        p++;
+    }
+
+    while (i <= mid1 && j <= mid2)
+    {
+        comparisons++;
+
+        if (a[i] <= a[j])
+        {
+            temp[p] = a[i];
+            i++;
+        }
+        else
+        {
+            temp[p] = a[j];
+            j++;
+        }
+
+        p++;
+    }
+
+    while (i <= mid1 && k <= right)
+    {
+        comparisons++;
+
+        if (a[i] <= a[k])
+        {
+            temp[p] = a[i];
+            i++;
+        }
+        else
+        {
+            temp[p] = a[k];
+            k++;
+        }
+
+        p++;
+    }
+
+    while (j <= mid2 && k <= right)
+    {
+        comparisons++;
+
+        if (a[j] <= a[k])
+        {
+            temp[p] = a[j];
+            j++;
+        }
+        else
+        {
+            temp[p] = a[k];
+            k++;
+        }
+
+        p++;
+    }
+
+    while (i <= mid1)
+    {
+        temp[p] = a[i];
+        i++;
+        p++;
+    }
+
+    while (j <= mid2)
+    {
+        temp[p] = a[j];
+        j++;
+        p++;
+    }
+
+    while (k <= right)
+    {
+        temp[p] = a[k];
+        k++;
+        p++;
+    }
+
+    for (i = left; i <= right; i++)
+    {
+        a[i] = temp[i];
+    }
+
+    return comparisons;
+}
+
+
+long long threeWayMergeSort(int a[], int temp[],int left, int right)
+{
+    int n;
+    int third;
+    int mid1;
+    int mid2;
+
+    long long comparisons = 0;
+
+    if (left < right)
+    {
+        n = right - left + 1;
+
+        third = n / 3;
+
+        if (n < 3)
+        {
+            int mid = left + (right - left) / 2;
+
+            comparisons +=
+                threeWayMergeSort(a, temp, left, mid);
+
+            comparisons +=
+                threeWayMergeSort(a, temp, mid + 1, right);
+
+            comparisons +=
+                mergeTwo(a, temp, left, mid, right);
+
+            return comparisons;
+        }
+
+        mid1 = left + third - 1;
+
+        mid2 = left + 2 * third - 1;
+
+
+        if (mid2 >= right)
+        {
+            mid2 = right - 1;
+        }
+
+        comparisons +=
+            threeWayMergeSort(a, temp, left, mid1);
+
+        comparisons +=
+            threeWayMergeSort(a, temp, mid1 + 1, mid2);
+
+        comparisons +=
+            threeWayMergeSort(a, temp, mid2 + 1, right);
+
+        comparisons +=
+            mergeThree(a, temp,
+                       left, mid1,
+                       mid2, right);
+    }
+
+    return comparisons;
+}
+
+int isSorted(int a[], int n)
+{
+    int i;
+
+    for (i = 1; i < n; i++)
+    {
+        if (a[i - 1] > a[i])
+        {
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
+{
+    FILE *fp;
+
+    int n;
+    int maxSize = 5000;
+
+    int *original;
+    int *array1;
+    int *array2;
+    int *temp1;
+    int *temp2;
+
+    long long mergeComparisons;
+    long long threeWayComparisons;
+
+    original = (int *)malloc(maxSize * sizeof(int));
+    array1 = (int *)malloc(maxSize * sizeof(int));
+    array2 = (int *)malloc(maxSize * sizeof(int));
+
+    temp1 = (int *)malloc(maxSize * sizeof(int));
+    temp2 = (int *)malloc(maxSize * sizeof(int));
+
+    if (original == NULL ||
+        array1 == NULL ||
+        array2 == NULL ||
+        temp1 == NULL ||
+        temp2 == NULL)
+    {
+        printf("Memory allocation failed.\n");
+        return;
+    }
+
+    fp = fopen("merge_comparison.csv", "w");
+
+    if (fp == NULL)
+    {
+        printf("Unable to create CSV file.\n");
+        return;
+    }
+
+    fprintf(fp,
+            "n,MergeSort,ModifiedMergeSort\n");
+
+    printf("\n");
+    printf("===============================================\n");
+    printf(" Merge Sort Comparison Analysis\n");
+    printf("===============================================\n\n");
+
+    printf("%-10s %-20s %-25s\n",
+           "n",
+           "Merge Sort",
+           "Modified Merge Sort");
+
+    printf("-----------------------------------------------\n");
+
+  
+    for (n = 30; n <= maxSize; n += 30)
+    {
+        generateRandomArray(original, n);
+
+        copyArray(original, array1, n);
+        copyArray(original, array2, n);
+
+        mergeComparisons =
+            mergeSort(array1, temp1, 0, n - 1);
+
+        threeWayComparisons =
+            threeWayMergeSort(array2, temp2, 0, n - 1);
+
+        fprintf(fp,
+                "%d,%lld,%lld\n",
+                n,
+                mergeComparisons,
+                threeWayComparisons);
+
+        printf("%-10d %-20lld %-25lld\n",
+               n,
+               mergeComparisons,
+               threeWayComparisons);
+
+        if (!isSorted(array1, n) ||
+            !isSorted(array2, n))
+        {
+            printf("ERROR: Sorting failed for n = %d\n", n);
+        }
+    }
+
+    fclose(fp);
+
+    free(original);
+    free(array1);
+    free(array2);
+    free(temp1);
+    free(temp2);
+
+    printf("\nCSV file generated successfully.\n");
+    printf("File: merge_comparison.csv\n");
+}
+
+void createPlotScript()
+{
+    FILE *gp;
+
+    gp = fopen("merge_plot.gnuplot", "w");
+
+    if (gp == NULL)
+    {
+        printf("Unable to create GNUplot script.\n");
+        return;
+    }
+
+    fprintf(gp, "set title 'Merge Sort vs Modified Merge Sort'\n");
+    fprintf(gp, "set xlabel 'Input Size (n)'\n");
+    fprintf(gp, "set ylabel 'Number of Comparisons'\n");
+    fprintf(gp, "set grid\n");
+    fprintf(gp, "set key left top\n");
+    fprintf(gp, "set datafile separator ','\n");
+
+    fprintf(gp,
+            "plot 'merge_comparison.csv' using 1:2 "
+            "with linespoints title 'Merge Sort', "
+            "'merge_comparison.csv' using 1:3 "
+            "with linespoints title 'Modified Merge Sort'\n");
+
+    fclose(gp);
+
+    printf("GNUplot script generated.\n");
+    printf("File: merge_plot.gnuplot\n");
+}
+int main()
+{
+    srand((unsigned int)time(NULL));
+
+    printf("\n");
+    printf("***********************************************\n");
+    printf("* MERGE SORT VS MODIFIED MERGE SORT           *\n");
+    printf("***********************************************\n");
+
+    printf("\nWorst-case complexity:\n");
+    printf("Normal Merge Sort       : O(n log n)\n");
+    printf("Modified Merge Sort     : O(n log n)\n");
+
+    createCSV();
+
+    createPlotScript();
+
+    printf("\n");
+    printf("===============================================\n");
+    printf("Analysis completed.\n");
+    printf("===============================================\n");
+
+    printf("\nTo plot the graph using GNUplot, run:\n");
+    printf("gnuplot merge_plot.gnuplot\n");
+
+    return 0;
+}
