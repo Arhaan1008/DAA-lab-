@@ -1,1 +1,338 @@
+Merging K sorted arrays.
 
+Code:
+
+#include <iostream>
+#include <vector>
+#include <fstream>
+#include <cstdlib>
+#include <ctime>
+
+using namespace std;
+
+long long mergeTwo(const vector<int>& a,
+                   const vector<int>& b,
+                   vector<int>& result)
+{
+    int i = 0;
+    int j = 0;
+
+    long long comparisons = 0;
+
+    result.clear();
+    result.reserve(a.size() + b.size());
+
+    while (i < (int)a.size() && j < (int)b.size())
+    {
+        comparisons++;
+
+        if (a[i] <= b[j])
+        {
+            result.push_back(a[i]);
+            i++;
+        }
+        else
+        {
+            result.push_back(b[j]);
+            j++;
+        }
+    }
+
+    while (i < (int)a.size())
+    {
+        result.push_back(a[i]);
+        i++;
+    }
+
+    while (j < (int)b.size())
+    {
+        result.push_back(b[j]);
+        j++;
+    }
+
+    return comparisons;
+}
+
+void generateSortedArrays(vector<vector<int> >& arrays,
+                          int k, int n)
+{
+    int i, j;
+
+    arrays.clear();
+    arrays.resize(k);
+
+    for (i = 0; i < k; i++)
+    {
+        arrays[i].resize(n);
+
+        for (j = 0; j < n; j++)
+        {
+            arrays[i][j] = rand() % 100000;
+        }
+
+        for (j = 1; j < n; j++)
+        {
+            int key = arrays[i][j];
+            int p = j - 1;
+
+            while (p >= 0 && arrays[i][p] > key)
+            {
+                arrays[i][p + 1] = arrays[i][p];
+                p--;
+            }
+
+            arrays[i][p + 1] = key;
+        }
+    }
+}
+
+long long method1(const vector<vector<int> >& arrays)
+{
+    vector<int> result;
+    vector<int> temp;
+
+    long long comparisons = 0;
+
+    if (arrays.empty())
+        return 0;
+
+    result = arrays[0];
+
+    for (int i = 1; i < (int)arrays.size(); i++)
+    {
+        comparisons += mergeTwo(result, arrays[i], temp);
+
+        result = temp;
+    }
+
+    return comparisons;
+}
+
+long long method2(vector<vector<int> > arrays)
+{
+    long long comparisons = 0;
+
+    while (arrays.size() > 1)
+    {
+        vector<vector<int> > nextLevel;
+
+        for (int i = 0; i < (int)arrays.size(); i += 2)
+        {
+            if (i + 1 < (int)arrays.size())
+            {
+                vector<int> merged;
+
+                comparisons += mergeTwo(
+                    arrays[i],
+                    arrays[i + 1],
+                    merged
+                );
+
+                nextLevel.push_back(merged);
+            }
+            else
+            {
+      
+                nextLevel.push_back(arrays[i]);
+            }
+        }
+
+        arrays = nextLevel;
+    }
+
+    return comparisons;
+}
+
+
+bool isSorted(const vector<int>& a)
+{
+    for (int i = 1; i < (int)a.size(); i++)
+    {
+        if (a[i - 1] > a[i])
+            return false;
+    }
+
+    return true;
+}
+
+vector<int> getResultMethod1(const vector<vector<int> >& arrays)
+{
+    vector<int> result;
+    vector<int> temp;
+
+    if (arrays.empty())
+        return result;
+
+    result = arrays[0];
+
+    for (int i = 1; i < (int)arrays.size(); i++)
+    {
+        mergeTwo(result, arrays[i], temp);
+        result = temp;
+    }
+
+    return result;
+}
+
+vector<int> getResultMethod2(vector<vector<int> > arrays)
+{
+    while (arrays.size() > 1)
+    {
+        vector<vector<int> > nextLevel;
+
+        for (int i = 0; i < (int)arrays.size(); i += 2)
+        {
+            if (i + 1 < (int)arrays.size())
+            {
+                vector<int> merged;
+
+                mergeTwo(
+                    arrays[i],
+                    arrays[i + 1],
+                    merged
+                );
+
+                nextLevel.push_back(merged);
+            }
+            else
+            {
+                nextLevel.push_back(arrays[i]);
+            }
+        }
+
+        arrays = nextLevel;
+    }
+
+    return arrays[0];
+}
+
+void createCSV(int n)
+{
+    ofstream file("k_array_merge.csv");
+
+    if (!file)
+    {
+        cout << "Error: Could not create CSV file.\n";
+        return;
+    }
+
+    file << "k,Method1,Method2\n";
+
+    cout << "\n";
+    cout << "===============================================\n";
+    cout << "Merging K Sorted Arrays\n";
+    cout << "n = " << n << "\n";
+    cout << "===============================================\n\n";
+
+    cout << "k\tMethod 1\tMethod 2\n";
+    cout << "-----------------------------------------------\n";
+
+    for (int k = 2; k <= 128; k *= 2)
+    {
+        vector<vector<int> > arrays;
+
+        generateSortedArrays(arrays, k, n);
+
+        long long c1 = method1(arrays);
+        long long c2 = method2(arrays);
+
+        file << k << "," << c1 << "," << c2 << "\n";
+
+        cout << k << "\t"
+             << c1 << "\t\t"
+             << c2 << "\n";
+
+        vector<int> result1 =
+            getResultMethod1(arrays);
+
+        vector<int> result2 =
+            getResultMethod2(arrays);
+
+        if (!isSorted(result1))
+        {
+            cout << "Error: Method 1 did not sort correctly.\n";
+        }
+
+        if (!isSorted(result2))
+        {
+            cout << "Error: Method 2 did not sort correctly.\n";
+        }
+
+        if (result1 != result2)
+        {
+            cout << "Error: Results are different.\n";
+        }
+    }
+
+    file.close();
+
+    cout << "\nCSV file created successfully:\n";
+    cout << "k_array_merge.csv\n";
+}
+
+void createPlotScript()
+{
+    ofstream file("k_array_merge.gnuplot");
+
+    if (!file)
+    {
+        cout << "Error: Could not create GNUplot file.\n";
+        return;
+    }
+
+    file << "set title 'Merging K Sorted Arrays'\n";
+    file << "set xlabel 'Number of Arrays (k)'\n";
+    file << "set ylabel 'Number of Comparisons'\n";
+    file << "set grid\n";
+    file << "set key left top\n";
+    file << "set datafile separator ','\n";
+
+    file << "plot "
+         << "'k_array_merge.csv' using 1:2 "
+         << "with linespoints title 'Method 1: Sequential', "
+         << "'k_array_merge.csv' using 1:3 "
+         << "with linespoints title 'Method 2: Pairwise'\n";
+
+    file.close();
+
+    cout << "GNUplot script created:\n";
+    cout << "k_array_merge.gnuplot\n";
+}
+
+
+int main()
+{
+    int n;
+
+    srand((unsigned int)time(NULL));
+
+    cout << "===============================================\n";
+    cout << " MERGING K SORTED ARRAYS\n";
+    cout << "===============================================\n";
+
+    cout << "\nEnter number of elements in each array (n): ";
+    cin >> n;
+
+    if (n <= 0)
+    {
+        cout << "Invalid value of n.\n";
+        return 0;
+    }
+
+    cout << "\nTheoretical complexities:\n";
+    cout << "Method 1: O(n * k^2)\n";
+    cout << "Method 2: O(n * k * log2(k))\n";
+
+    createCSV(n);
+
+    createPlotScript();
+
+    cout << "\n===============================================\n";
+    cout << "Analysis completed successfully.\n";
+    cout << "===============================================\n";
+
+    cout << "\nTo plot the graph using GNUplot, run:\n";
+    cout << "gnuplot k_array_merge.gnuplot\n";
+
+    return 0;
+}
