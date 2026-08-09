@@ -1,0 +1,191 @@
+1. Dictionary operations 
+
+CODE :
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int log2_count(int n)
+{
+    int count = 0;
+
+    while (n > 1)
+    {
+        n = n / 2;
+        count++;
+    }
+
+    return count;
+}
+
+void print_complexity_table()
+{
+    printf("\n");
+    printf("===============================================================\n");
+    printf("       DICTIONARY ADT - WORST CASE COMPLEXITIES\n");
+    printf("===============================================================\n\n");
+
+    printf("%-15s %-10s %-10s %-12s %-12s %-12s %-12s\n",
+           "Operation",
+           "UA",
+           "SA",
+           "SUL",
+           "SSL",
+           "DUL",
+           "DSL");
+
+    printf("---------------------------------------------------------------\n");
+
+    printf("%-15s %-10s %-10s %-12s %-12s %-12s %-12s\n",
+           "Search",
+           "O(n)", "O(log n)", "O(n)", "O(n)", "O(n)", "O(n)");
+
+    printf("%-15s %-10s %-10s %-12s %-12s %-12s %-12s\n",
+           "Insert",
+           "O(1)", "O(n)", "O(1)", "O(n)", "O(1)", "O(n)");
+
+    printf("%-15s %-10s %-10s %-12s %-12s %-12s %-12s\n",
+           "Delete",
+           "O(1)", "O(n)", "O(n)", "O(n)", "O(1)", "O(1)");
+
+    printf("%-15s %-10s %-10s %-12s %-12s %-12s %-12s\n",
+           "Maximum",
+           "O(n)", "O(1)", "O(n)", "O(n)", "O(n)", "O(n)");
+
+    printf("%-15s %-10s %-10s %-12s %-12s %-12s %-12s\n",
+           "Minimum",
+           "O(n)", "O(1)", "O(n)", "O(1)", "O(n)", "O(1)");
+
+    printf("%-15s %-10s %-10s %-12s %-12s %-12s %-12s\n",
+           "Predecessor",
+           "O(n)", "O(1)", "O(n)", "O(n)", "O(n)", "O(1)");
+
+    printf("%-15s %-10s %-10s %-12s %-12s %-12s %-12s\n",
+           "Successor",
+           "O(n)", "O(1)", "O(n)", "O(1)", "O(n)", "O(1)");
+
+    printf("===============================================================\n");
+}
+
+void generate_csv()
+{
+    FILE *fp;
+    int n;
+
+    fp = fopen("dictionary_complexity.csv", "w");
+
+    if (fp == NULL)
+    {
+        printf("\nError: Could not create CSV file.\n");
+        return;
+    }
+
+    fprintf(fp,
+        "n,"
+        "UA_Search,SA_Search,SUL_Search,SSL_Search,DUL_Search,DSL_Search,"
+        "UA_Insert,SA_Insert,SUL_Insert,SSL_Insert,DUL_Insert,DSL_Insert,"
+        "UA_Delete,SA_Delete,SUL_Delete,SSL_Delete,DUL_Delete,DSL_Delete,"
+        "UA_Max,SA_Max,SUL_Max,SSL_Max,DUL_Max,DSL_Max,"
+        "UA_Min,SA_Min,SUL_Min,SSL_Min,DUL_Min,DSL_Min,"
+        "UA_Pred,SA_Pred,SUL_Pred,SSL_Pred,DUL_Pred,DSL_Pred,"
+        "UA_Succ,SA_Succ,SUL_Succ,SSL_Succ,DUL_Succ,DSL_Succ\n"
+    );
+
+    for (n = 10; n <= 1000; n += 10)
+    {
+        int logn = log2_count(n);
+
+       
+        fprintf(fp, "%d,", n);
+
+        fprintf(fp, "%d,%d,%d,%d,%d,%d,",
+                n, logn, n, n, n, n);
+
+        /
+
+        fprintf(fp, "%d,%d,%d,%d,%d,%d,",
+                1, n, 1, n, 1, n);
+
+
+        fprintf(fp, "%d,%d,%d,%d,%d,%d,",
+                1, n, n, n, 1, 1);
+
+        
+
+        fprintf(fp, "%d,%d,%d,%d,%d,%d,",
+                n, 1, n, n, n, n);
+
+        
+
+        fprintf(fp, "%d,%d,%d,%d,%d,%d,",
+                n, 1, n, 1, n, 1);
+
+        
+
+        fprintf(fp, "%d,%d,%d,%d,%d,%d,",
+                n, 1, n, n, n, 1);
+
+        
+
+        fprintf(fp, "%d,%d,%d,%d,%d,%d\n",
+                n, 1, n, 1, n, 1);
+    }
+
+    fclose(fp);
+
+    printf("\nCSV file created successfully!\n");
+    printf("File name: dictionary_complexity.csv\n");
+}
+
+void print_sample_data()
+{
+    int n;
+
+    printf("\n");
+    printf("===============================================================\n");
+    printf("             SAMPLE ORDER OF GROWTH DATA\n");
+    printf("===============================================================\n");
+
+    printf("\n");
+    printf("%-8s %-12s %-12s %-12s %-12s\n",
+           "n",
+           "O(1)",
+           "O(log n)",
+           "O(n)",
+           "O(n^2)");
+
+    printf("---------------------------------------------------------------\n");
+
+    for (n = 10; n <= 100; n += 10)
+    {
+        printf("%-8d %-12d %-12d %-12d %-12d\n",
+               n,
+               1,
+               log2_count(n),
+               n,
+               n * n);
+    }
+
+    printf("===============================================================\n");
+}
+
+int main()
+{
+    printf("\n");
+    printf("***************************************************************\n");
+    printf("*                 DICTIONARY ADT ANALYSIS                    *\n");
+    printf("***************************************************************\n");
+
+    print_complexity_table();
+
+    print_sample_data();
+
+    generate_csv();
+
+    printf("\n");
+    printf("Program completed successfully.\n");
+    printf("\n");
+    printf("Open 'dictionary_complexity.csv' in Excel to create graphs.\n");
+
+    return 0;
+}
